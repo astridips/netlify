@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astridips' Medium Articles</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .article {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .article:last-child {
+            border-bottom: none;
+        }
+        .article img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        .article-content {
+            flex: 1;
+        }
+        .article h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .article a {
+            text-decoration: none;
+            color: #0073e6;
+        }
+        .article a:hover {
+            text-decoration: underline;
+        }
+        p {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Astridips' Medium Articles</h1>
+        <div id="articles-list">
+            <p>Loading articles...</p>
+        </div>
+    </div>
+    <script>
+        async function fetchArticles() {
+            const rssUrl = "https://medium.com/feed/@astridips";
+            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+            
+            try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                
+                if (!data.items) throw new Error("No articles found");
+                
+                let articles = "";
+                data.items.forEach(item => {
+                    const title = item.title;
+                    const link = item.link;
+                    const date = new Date(item.pubDate).toDateString();
+                    const thumbnail = item.thumbnail || "https://via.placeholder.com/100";
+                    
+                    articles += `<div class='article'>
+                        <img src="${thumbnail}" alt="Thumbnail">
+                        <div class='article-content'>
+                            <h3><a href="${link}" target="_blank">${title}</a></h3>
+                            <p><strong>Date:</strong> ${date}</p>
+                        </div>
+                    </div>`;
+                });
+                
+                document.getElementById("articles-list").innerHTML = articles;
+            } catch (error) {
+                console.error("Error fetching articles:", error);
+                document.getElementById("articles-list").innerHTML = "<p>Failed to load articles.</p>";
+            }
+        }
+        
+        fetchArticles();
+    </script>
+</body>
+</html>
